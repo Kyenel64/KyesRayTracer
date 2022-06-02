@@ -2,6 +2,7 @@
 
 bool Sphere::hit(const Ray& r, double t_min, double t_max, hit_record& rec) const
 {
+    // math to detect if ray hits sphere.
     vec3 oc = r.origin() - center; // center of sphere
     auto a = r.direction().length_squared();
     auto half_b = dot(oc, r.direction());
