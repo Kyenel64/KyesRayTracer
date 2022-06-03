@@ -32,7 +32,7 @@ int main()
 {
     // Image propterties
     const auto aspect_ratio = 16.0 / 9.0;
-    const int image_width = 600;
+    const int image_width = 400;
     const int image_height = static_cast<int>(image_width / aspect_ratio);
     const int samples_per_pixel = 100;
     const int maxDepth = 50;
@@ -43,7 +43,7 @@ int main()
     world.add(std::make_shared<Sphere>(point3(0, -100.5, -1), 100));
 
     // Camera
-    Camera cam(cameraPos, FOV, aspect_ratio);
+    Camera cam;
 
     // Render
     std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
