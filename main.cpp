@@ -7,6 +7,9 @@
 #include <iostream>
 #include <chrono>
 
+point3 cameraPos(0, 0, 0);
+auto FOV = 90.0;
+
 color ray_color(const Ray& r, const Hittable& world)
 {
     hit_record rec;
@@ -33,7 +36,7 @@ int main()
     world.add(std::make_shared<Sphere>(point3(0, -100.5, -1), 100));
 
     // Camera
-    Camera cam;
+    Camera cam(cameraPos, FOV, aspect_ratio);
 
     // Render
     std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
@@ -44,7 +47,8 @@ int main()
         std::cerr << "\rScanlines remaining: " << i << std::flush;
         for (int j = 0; j < image_width; j++)
         {
-            color pixel_color(0, 0, 0);
+            color pixel_color;
+            // anti aliasing
             for (int s = 0; s < samples_per_pixel; s++)
             {
                 auto u = (j + random_double()) / (image_width - 1);
@@ -59,7 +63,7 @@ int main()
     // calculate time taken to render
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-    std::cerr << "\nFinished in: " << duration.count() << " ms" << std::endl;
+    std::cerr << "\nFinished in: " << duration.count() / 1000000.0 << "seconds" << std::endl;
 
     return 0;
 }

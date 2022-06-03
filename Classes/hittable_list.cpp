@@ -1,20 +1,24 @@
 #include "hittable_list.h"
 
+// Constructor
 Hittable_list::Hittable_list(std::shared_ptr<Hittable> object)
 {
     add(object);
 }
 
+// Clear list of objects
 void Hittable_list::clear()
 {
     objects.clear();
 }
 
+// Add object to list of objects
 void Hittable_list::add(std::shared_ptr<Hittable> object)
 {
     objects.push_back(object);
 }
 
+// Hit detect with ray for all objects. keep track of closest ray to draw.
 bool Hittable_list::hit(const Ray& r, double t_min, double t_max, hit_record& rec) const
 {
     hit_record temp_rec;
