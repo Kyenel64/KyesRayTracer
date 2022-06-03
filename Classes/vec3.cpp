@@ -1,4 +1,5 @@
 #include "vec3.h"
+#include "rt.h"
 vec3::vec3() : e{0, 0, 0} {}
 
 vec3::vec3(double e0, double e1, double e2) : e{e0, e1, e2} {}
@@ -56,4 +57,13 @@ double vec3::length() const
 double vec3::length_squared() const
 {
     return e[0]*e[0] + e[1]*e[1] + e[2]*e[2];
+}
+
+vec3 vec3::random()
+{
+    return vec3(random_double(), random_double(), random_double());
+}
+vec3 vec3::random(double min, double max)
+{
+    return vec3(random_double(min, max), random_double(min, max), random_double(min, max));
 }
