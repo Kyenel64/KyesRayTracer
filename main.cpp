@@ -1,4 +1,5 @@
 #include "rt.h"
+
 #include "hittable_list.h"
 #include "sphere.h"
 #include "color.h"
@@ -10,12 +11,17 @@
 point3 cameraPos(0, 0, 0);
 auto FOV = 90.0;
 
-color ray_color(const Ray& r, const Hittable& world)
+color ray_color(const Ray& r, const Hittable& world, int depth)
 {
     hit_record rec;
+    if (depth <= 0)
+    {
+        return color(0, 0, 0);
+    }
     if (world.hit(r, 0, infinity, rec))
     {
-        return 0.5 * (rec.normal + color(1, 1, 1));
+        point3 target = rec.p + rec.normal + random_in_unit_sphere();
+        return 0.5 * ray_color(Ray(rec.p, target - rec.p), world, depth-1);
     }
     vec3 unit_direction = unit_vector(r.direction());
     auto t = 0.5 * (unit_direction.y() + 1.0);
@@ -29,6 +35,7 @@ int main()
     const int image_width = 600;
     const int image_height = static_cast<int>(image_width / aspect_ratio);
     const int samples_per_pixel = 100;
+    const int maxDepth = 50;
 
     // World
     Hittable_list world;
@@ -54,7 +61,7 @@ int main()
                 auto u = (j + random_double()) / (image_width - 1);
                 auto v = (i + random_double()) / (image_height - 1);
                 Ray r = cam.get_ray(u, v);
-                pixel_color += ray_color(r, world);
+                pixel_color += ray_color(r, world, maxDepth);
             }
             write_color(std::cout, pixel_color, samples_per_pixel);
         }
