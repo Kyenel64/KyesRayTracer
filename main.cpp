@@ -11,6 +11,7 @@
 point3 cameraPos(0, 0, 0);
 auto FOV = 90.0;
 
+// calculate color of pixel
 color ray_color(const Ray& r, const Hittable& world, int depth)
 {
     hit_record rec;
@@ -18,11 +19,14 @@ color ray_color(const Ray& r, const Hittable& world, int depth)
     {
         return color(0, 0, 0);
     }
-    if (world.hit(r, 0, infinity, rec))
+    if (world.hit(r, 0.001, infinity, rec))
     {
-        point3 target = rec.p + rec.normal + random_in_unit_sphere();
+        // create reflecion vector
+        point3 target = rec.p + rec.normal + random_unit_vector();
+        // Recursively cast reflection rays half the strength.
         return 0.5 * ray_color(Ray(rec.p, target - rec.p), world, depth-1);
     }
+    // background color
     vec3 unit_direction = unit_vector(r.direction());
     auto t = 0.5 * (unit_direction.y() + 1.0);
     return (1.0-t) * color(1.0, 1.0, 1.0) + t*color(0.5, 0.7, 1.0); //lerp
@@ -32,10 +36,10 @@ int main()
 {
     // Image propterties
     const auto aspect_ratio = 16.0 / 9.0;
-    const int image_width = 400;
+    const int image_width = 1920; //default 400
     const int image_height = static_cast<int>(image_width / aspect_ratio);
-    const int samples_per_pixel = 100;
-    const int maxDepth = 50;
+    const int samples_per_pixel = 500; // default 100
+    const int maxDepth = 10; // default 50
 
     // World
     Hittable_list world;
