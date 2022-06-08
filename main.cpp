@@ -2,7 +2,6 @@
 
 #include "hittable_list.h"
 #include "sphere.h"
-#include "color.h"
 #include "camera.h"
 
 #include <iostream>
@@ -10,6 +9,24 @@
 
 point3 cameraPos(0, 0, 0);
 auto FOV = 90.0;
+
+void write_color(std::ostream &out, color pixel_color, int samples_per_pixel)
+{
+    auto r = pixel_color.x();
+    auto g = pixel_color.y();
+    auto b = pixel_color.z();
+
+    // Divide color by number of samples. Gamma correct.
+    auto scale = 1.0 / samples_per_pixel;
+    r = sqrt(scale * r);
+    g = sqrt(scale * g);
+    b = sqrt(scale * b);
+
+    // Print translated [0, 255] value of each color
+    out << static_cast<int>(256 * clamp(r, 0.0, 0.999)) << ' '
+        << static_cast<int>(256 * clamp(g, 0.0, 0.999)) << ' '
+        << static_cast<int>(256 * clamp(b, 0.0, 0.999)) << std::endl;
+}
 
 // calculate color of pixel
 color ray_color(const Ray& r, const Hittable& world, int depth)
@@ -36,9 +53,9 @@ int main()
 {
     // Image propterties
     const auto aspect_ratio = 16.0 / 9.0;
-    const int image_width = 1920; //default 400
+    const int image_width = 1000; //default 400
     const int image_height = static_cast<int>(image_width / aspect_ratio);
-    const int samples_per_pixel = 500; // default 100
+    const int samples_per_pixel = 100; // default 100
     const int maxDepth = 10; // default 50
 
     // World
