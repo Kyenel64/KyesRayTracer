@@ -5,9 +5,9 @@
 
 struct hit_record
 {
-    point3 p;
-    vec3 normal;
-    double t;
+    point3 p; // Point of hit
+    vec3 normal; // Normal direction of hit
+    double t; // t value on ray
     bool front_face;
 
     // Reflect normal

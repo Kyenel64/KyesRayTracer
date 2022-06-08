@@ -25,9 +25,9 @@ bool Hittable_list::hit(const Ray& r, double t_min, double t_max, hit_record& re
     bool hit_anything = false;
     auto closest_so_far = t_max;
 
-    for (const auto& object : objects)
+    for (unsigned int i = 0; i < objects.size(); i++)
     {
-        if (object->hit(r, t_min, closest_so_far, temp_rec))
+        if (objects[i]->hit(r, t_min, closest_so_far, temp_rec))
         {
             hit_anything = true;
             closest_so_far = temp_rec.t;
