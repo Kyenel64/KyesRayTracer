@@ -3,10 +3,13 @@
 
 #include "rt.h"
 
+class Material;
+
 struct hit_record
 {
     point3 p; // Point of hit
     vec3 normal; // Normal direction of hit
+    std::shared_ptr<Material> mat_ptr; // Material properties
     double t; // t value on ray
     bool front_face;
 
