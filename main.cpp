@@ -33,11 +33,13 @@ void write_color(unsigned char* imageArr, int index, color pixel_color, int samp
 // calculate color of pixel
 color ray_color(const Ray& r, const Hittable& world, int depth)
 {
+    // temp hit record for each ray
     hit_record rec;
     if (depth <= 0)
     {
         return color(0, 0, 0);
     }
+    // Calculate color of ray bounces
     if (world.hit(r, 0.001, infinity, rec))
     {
         // Material colors
@@ -47,6 +49,7 @@ color ray_color(const Ray& r, const Hittable& world, int depth)
             return attenuation * ray_color(scattered, world, depth - 1);
         return color(0, 0, 0);
     }
+    
     // background color
     vec3 unit_direction = unit_vector(r.direction());
     auto t = 0.5 * (unit_direction.y() + 1.0);
@@ -59,16 +62,19 @@ int main()
     const auto aspect_ratio = 16.0 / 9.0;
     const int image_width = 1000; //default 400
     const int image_height = int((image_width / aspect_ratio));
+
+    // Rendering properties
     const int samples_per_pixel = 100; // default 100
-    const int maxDepth = 10; // default 50
+    const int maxDepth = 10; // number of ray bounces
 
     // World
     Hittable_list world;
 
-    auto material_ground = std::make_shared<Lambertian>(color(0.8, 0.8, 0.0));
-    auto material_center = std::make_shared<Lambertian>(color(0.7, 0.3, 0.3));
-    auto material_left   = std::make_shared<Metal>(color(0.8, 0.8, 0.8));
-    auto material_right  = std::make_shared<Metal>(color(0.8, 0.6, 0.2));
+
+    auto material_ground = std::make_shared<Lambertian>(color(1, 0.3, 0.0));
+    auto material_center = std::make_shared<Lambertian>(color(0.5, 1, 1));
+    auto material_left   = std::make_shared<Metal>(color(0.8, 0.8, 0.8), 0.2);
+    auto material_right  = std::make_shared<Metal>(color(0.8, 0.6, 0.2), 1.0);
 
     world.add(std::make_shared<Sphere>(point3( 0.0, -100.5, -1.0), 100.0, material_ground));
     world.add(std::make_shared<Sphere>(point3( 0.0,    0.0, -1.0),   0.5, material_center));
@@ -104,6 +110,7 @@ int main()
         }
     }
 
+    // Write to jpg
     stbi_flip_vertically_on_write(true);
     stbi_write_jpg("Renders/image.jpg", image_width, image_height, 3, imageArr, 100);
     delete[] imageArr;
