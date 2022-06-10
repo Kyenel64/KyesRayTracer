@@ -5,11 +5,14 @@
 #include "camera.h"
 #include "material.h"
 
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb_image_write.h"
+
 #include <iostream>
 #include <chrono>
 
 
-void write_color(std::ostream &out, color pixel_color, int samples_per_pixel)
+void write_color(unsigned char* imageArr, int index, color pixel_color, int samples_per_pixel)
 {
     auto r = pixel_color.x();
     auto g = pixel_color.y();
@@ -21,10 +24,10 @@ void write_color(std::ostream &out, color pixel_color, int samples_per_pixel)
     g = sqrt(scale * g);
     b = sqrt(scale * b);
 
-    // Print translated [0, 255] value of each color
-    out << static_cast<int>(256 * clamp(r, 0.0, 0.999)) << ' '
-        << static_cast<int>(256 * clamp(g, 0.0, 0.999)) << ' '
-        << static_cast<int>(256 * clamp(b, 0.0, 0.999)) << std::endl;
+    imageArr[index + 0] = int(256 * clamp(r, 0.0, 0.999));
+    imageArr[index + 1] = int(256 * clamp(g, 0.0, 0.999));
+    imageArr[index + 2] = int(256 * clamp(b, 0.0, 0.999));
+
 }
 
 // calculate color of pixel
@@ -52,10 +55,10 @@ color ray_color(const Ray& r, const Hittable& world, int depth)
 
 int main() 
 {
-    // Image propterties
+    // Image properties
     const auto aspect_ratio = 16.0 / 9.0;
-    const int image_width = 400; //default 400
-    const int image_height = static_cast<int>(image_width / aspect_ratio);
+    const int image_width = 1000; //default 400
+    const int image_height = int((image_width / aspect_ratio));
     const int samples_per_pixel = 100; // default 100
     const int maxDepth = 10; // default 50
 
@@ -75,8 +78,10 @@ int main()
     // Camera
     Camera cam;
 
-    // Render
-    std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
+
+    // ------------------ Render ---------------------
+    
+    unsigned char* imageArr = new unsigned char[image_width * image_height * 3 * sizeof(float)];
 
     auto start = std::chrono::high_resolution_clock::now();
     for (int i = image_height - 1; i >= 0; i--)
@@ -93,9 +98,16 @@ int main()
                 Ray r = cam.get_ray(u, v);
                 pixel_color += ray_color(r, world, maxDepth);
             }
-            write_color(std::cout, pixel_color, samples_per_pixel);
+
+            int index = (image_width * i * 3) + j * 3;
+            write_color(imageArr, index, pixel_color, samples_per_pixel);
         }
     }
+
+    stbi_flip_vertically_on_write(true);
+    stbi_write_jpg("Renders/image.jpg", image_width, image_height, 3, imageArr, 100);
+    delete[] imageArr;
+
 
     // calculate time taken to render
     auto stop = std::chrono::high_resolution_clock::now();
